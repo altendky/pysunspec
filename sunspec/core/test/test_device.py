@@ -413,7 +413,7 @@ class TestDevice(unittest.TestCase):
 
         d = root.find(pics.PICS_DEVICE)
         if d is None:
-            raise Exception("No '%s' elements found in '%s' element" % (pics.PICS_DEVICE, root.tag))
+            raise Exception("No '{}' elements found in '{}' element".format(pics.PICS_DEVICE, root.tag))
 
         d2 = device.Device()
         d2.from_pics(element=d)
@@ -431,7 +431,7 @@ class TestDevice(unittest.TestCase):
         value = m.points[p].value
         expected_value = -20
         if value != expected_value:
-            raise Exception("Value '%s' mismatch: %s %s" % (p, str(value), str(expected_value)))
+            raise Exception("Value '{}' mismatch: {} {}".format(p, str(value), str(expected_value)))
 
 
     def test_device_value_set(self):
@@ -444,6 +444,22 @@ class TestDevice(unittest.TestCase):
         m.points[p].value = expected_value
         value = m.points[p].value
         if value != expected_value:
+            raise Exception("Value '{}' mismatch: {} {}".format(p, str(value), str(expected_value)))
+
+
+    def test_device_value_set_rounding(self):
+        d = device.Device()
+        d.from_pics(filename='pics_test_device_1.xml', pathlist=self.pathlist)
+
+        m = d.models[63001][0]
+        m.points_sf['sunssf_1'].value = -1
+        expected_value = 84.3
+        p = 'int16_1'
+        point = m.points[p]
+        point.value_sf = point.sf_point.value_base
+        point.value = expected_value
+        value = point.value
+        if abs(value - expected_value) > 0.1 / 100:
             raise Exception("Value '%s' mismatch: %s %s" % (p, str(value), str(expected_value)))
 
 
@@ -472,7 +488,7 @@ class TestDevice(unittest.TestCase):
         p = 'Md'
         value = m_1.points[p].value
         if value != expected_value:
-            raise Exception("Value '%s' mismatch: %s %s" % (p, str(value), str(expected_value)))
+            raise Exception("Value '{}' mismatch: {} {}".format(p, str(value), str(expected_value)))
 
         m_63001 = d.models[63001][0]
         expected_value = -180
@@ -480,7 +496,7 @@ class TestDevice(unittest.TestCase):
         m_63001.points[p].value = expected_value
         value = m_63001.points[p].value
         if value != expected_value:
-            raise Exception("Value '%s' mismatch: %s %s" % (p, str(value), str(expected_value)))
+            raise Exception("Value '{}' mismatch: {} {}".format(p, str(value), str(expected_value)))
 
 
     # verify all models in the default models directory can be read
@@ -495,7 +511,7 @@ class TestDevice(unittest.TestCase):
                 if model_id is not None:
                     device.model_type_get(model_id)
             except Exception as e:
-                raise Exception('Error scanning model %s: %s' % (str(model_id), e))
+                raise Exception('Error scanning model {}: {}'.format(str(model_id), e))
 
     def test_device_constant_sf(self):
         d = device.Device()
@@ -506,7 +522,7 @@ class TestDevice(unittest.TestCase):
         value = m.points[p].value
         expected_value = 190
         if value != expected_value:
-            raise Exception("Value '%s' mismatch: %s %s" % (p, str(value), str(expected_value)))
+            raise Exception("Value '{}' mismatch: {} {}".format(p, str(value), str(expected_value)))
 
     def test_model_load_symbol_id_conflicts(self):
         model = device.Model(mid=17)

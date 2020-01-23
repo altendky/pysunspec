@@ -9,7 +9,7 @@ If you find these branches useful and want your own changes included please subm
 
 The pySunSpec package provides objects and applications that support
 interaction with SunSpec compliant devices and documents.  It can be run in
-most environments that support Python and is tested on Windows 7, Mac OS X, and
+most environments that support Python and is tested on Windows 7, macOS, and
 Ubuntu.
 
 Copyright (c) 2018 SunSpec Alliance
@@ -29,7 +29,7 @@ Copyright (c) 2018 SunSpec Alliance
 
 # Requirements
 
-- Python 2.7, 3.3-3.7
+- Python 2.7, 3.5-3.8
 - pySerial
 
 
@@ -76,6 +76,11 @@ well as the pySunSpec source.  The models repository is referenced in the
 
 ```
 git clone --recursive https://github.com/sunspec/pysunspec.git
+```
+on some systems (Debian based), you could be able to download it as a package (raspberry pi for ex.)
+
+```
+$ sudo apt-get install python-serial
 ```
 
 If a non-recursive clone was done, the models can be retreived using the

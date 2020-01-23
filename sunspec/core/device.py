@@ -160,7 +160,7 @@ class Device(object):
 
                 d = root.find(pics.PICS_DEVICE)
                 if d is None:
-                    raise SunSpecError("No '%s' elements found in '%s' element" % (pics.PICS_DEVICE, root.tag))
+                    raise SunSpecError("No '{}' elements found in '{}' element".format(pics.PICS_DEVICE, root.tag))
             else:
                 d = element
             if d.tag != pics.PICS_DEVICE:
@@ -170,9 +170,9 @@ class Device(object):
 
             for m in d.findall('*'):
                 if m is None:
-                    raise SunSpecError("No '%s' elements found in '%s' element" % (pics.PICS_MODEL, d.tag))
+                    raise SunSpecError("No '{}' elements found in '{}' element".format(pics.PICS_MODEL, d.tag))
                 if m.tag != pics.PICS_MODEL:
-                    raise SunSpecError("Unexpected '%s' element in '%s' element" % (m.tag, d.tag))
+                    raise SunSpecError("Unexpected '{}' element in '{}' element".format(m.tag, d.tag))
 
                 model_id = m.attrib.get(pics.PICS_ATTR_ID)
                 if model_id is None:
@@ -339,7 +339,7 @@ class Block(object):
 
         for p in element.findall('*'):
             if p.tag != pics.PICS_POINT:
-                raise SunSpecError("Unexpected '%s' element in '%s' element" % (p.tag, element.tag))
+                raise SunSpecError("Unexpected '{}' element in '{}' element".format(p.tag, element.tag))
             pid = p.attrib.get(pics.PICS_ATTR_ID)
             point = self.points.get(pid)
             if point is None:
@@ -394,7 +394,7 @@ class Block(object):
 
         s = self.block_type.not_equal(block.block_type)
         if s:
-            return 'block %s not equal - block type not equal: %s' % (self.block_type.type, s)
+            return 'block {} not equal - block type not equal: {}'.format(self.block_type.type, s)
 
         for point in self.points_list:
             s = point.not_equal(block.points.get(point.point_type.id))
@@ -588,7 +588,7 @@ class Point(object):
 
         s = self.point_type.not_equal(point.point_type)
         if s:
-            return 'point %s not equal - point type not equal: %s' % (self.point_type.id, s)
+            return 'point {} not equal - point type not equal: {}'.format(self.point_type.id, s)
 
         if (((self.value_base is not None or point.value_base is not None) and (self.value_base != point.value_base)) or
             ((self.value_sf is not None or point.value_sf is not None) and (self.value_sf != point.value_sf))):
@@ -596,11 +596,12 @@ class Point(object):
                 print('self.value_base')
             if point.value_base is not None:
                 print('point.value_base', type(point.value_base), point.value_base)
-            return 'point %s not equal: %s %s - %s %s' % (self.point_type.id, self.value_base, self.value_sf, point.value_base, point.value_sf)
+            return 'point {} not equal: {} {} - {} {}'.format(self.point_type.id, self.value_base, self.value_sf, point.value_base, point.value_sf)
         return False
 
     def __str__(self):
-        point_str = 'Point: id = %s impl= %s addr = %s value_base = %s' % (self.point_type.id, str(self.impl), self.addr, str(self.value_base))
+        point_str = 'Point: id = %s impl = %s addr = %s value_base = %s' % (self.point_type.id, str(self.impl), self.addr, str(self.value_base))
+        
         if self.sf_point is not None:
             point_str += ' sf_value = %s' % (str(self.sf_point.value_base))
         return point_str
@@ -735,7 +736,7 @@ class Model(object):
                 for point_type in block_type.points_list:
                     if point_type.type != suns.SUNS_TYPE_PAD:
                         point_addr = int(block_addr) + int(point_type.offset)
-                        point = point_class(block, point_type, str(point_addr))
+                        point = point_class(block=block, point_type=point_type, addr=str(point_addr))
                         if point_addr + point.point_type.len - last_read_addr > MAX_READ_COUNT:
                             last_read_addr = point_addr
                             self.read_blocks.append(last_read_addr)
@@ -801,7 +802,7 @@ class Model(object):
 
         for b in element.findall('*'):
             if b.tag != pics.PICS_BLOCK:
-                raise SunSpecError("Unexpected '%s' element in '%s' element" % (b.tag, element.tag))
+                raise SunSpecError("Unexpected '{}' element in '{}' element".format(b.tag, element.tag))
             block_type = pics.pics_block_types.get(b.attrib.get(pics.PICS_ATTR_TYPE, pics.PICS_TYPE_FIXED))
             if block_type is None:
                 raise SunSpecError('Unknown block type')
@@ -865,12 +866,12 @@ class Model(object):
             return 'model %s not equal - block counts: %d  %d' % (self.model_type.id, len(self.blocks), len(model.blocks))
         s = self.model_type.not_equal(model.model_type)
         if s:
-            return 'model %s not equal - model id not equal: %s' % (self.model_type.id, s)
+            return 'model {} not equal - model id not equal: {}'.format(self.model_type.id, s)
 
         for i in range(len(self.blocks)):
             s = self.blocks[i].not_equal(model.blocks[i])
             if s:
-                return 'model %s not equal - %s' % (self.model_type.id, s)
+                return 'model {} not equal - {}'.format(self.model_type.id, s)
         return False
 
     def __str__(self):
@@ -914,7 +915,7 @@ def model_type_get(model_id):
                     smdx_data = f.read()
                     f.close()
                 except Exception as e:
-                    raise SunSpecError('Error loading model %s at %s: %s' % (model_id, filename, str(e)))
+                    raise SunSpecError('Error loading model {} at {}: {}'.format(model_id, filename, str(e)))
 
         if smdx_data:
             root = ET.fromstring(smdx_data)
@@ -925,7 +926,7 @@ def model_type_get(model_id):
                 model_type.from_smdx(root)
                 model_types[model_type.id] = model_type
             except Exception as e:
-                raise SunSpecError('Error loading model %s at %s: %s' % (model_id, filename, str(e)))
+                raise SunSpecError('Error loading model {} at {}: {}'.format(model_id, filename, str(e)))
         else:
             raise SunSpecError('Model file for model %s not found' % (str(model_id)))
 
@@ -1077,15 +1078,15 @@ class ModelType(object):
         if model_type is None:
             return "ModelType is None"
         if self.id != model_type.id:
-            return "ModelType attribute 'id' not equal: %s  %s" % (str(self.id), str(model_type.id))
+            return "ModelType attribute 'id' not equal: {}  {}".format(str(self.id), str(model_type.id))
         if self.len != model_type.len:
-            return "ModelType attribute 'len' not equal: %s  %s" % (str(self.len), str(model_type.len))
+            return "ModelType attribute 'len' not equal: {}  {}".format(str(self.len), str(model_type.len))
         if self.label != model_type.label:
-            return "ModelType attribute 'label' not equal: %s  %s" % (str(self.label), str(model_type.label))
+            return "ModelType attribute 'label' not equal: {}  {}".format(str(self.label), str(model_type.label))
         if self.description != model_type.description:
-            return "ModelType attribute 'description' not equal: %s  %s" % (str(self.description), str(model_type.description))
+            return "ModelType attribute 'description' not equal: {}  {}".format(str(self.description), str(model_type.description))
         if self.notes != model_type.notes:
-            return "ModelType attribute 'notes' not equal: %s  %s" % (str(self.notes), str(model_type.notes))
+            return "ModelType attribute 'notes' not equal: {}  {}".format(str(self.notes), str(model_type.notes))
         if self.fixed_block is not None:
             not_equal = self.fixed_block.not_equal(model_type.fixed_block)
             if not_equal:
@@ -1103,7 +1104,7 @@ class ModelType(object):
 
     def __str__(self):
 
-        s = 'ModelType: id = %s len = %s\n' % (self.id, self.len)
+        s = 'ModelType: id = {} len = {}\n'.format(self.id, self.len)
         if self.fixed_block:
             s += str(self.fixed_block)
         if self.repeating_block:
@@ -1199,9 +1200,9 @@ class BlockType(object):
         if block_type is None:
             return "BlockType '%s' is none" % (str(self.type))
         if self.type != block_type.type:
-            return "BlockType attribute 'type' not equal: %s  %s" % (str(self.type), str(block_type.type))
+            return "BlockType attribute 'type' not equal: {}  {}".format(str(self.type), str(block_type.type))
         if self.len != block_type.len:
-            return "BlockType attribute 'len' not equal: %s  %s" % (str(self.len), str(block_type.len))
+            return "BlockType attribute 'len' not equal: {}  {}".format(str(self.len), str(block_type.len))
         if len(self.points) != len(block_type.points):
             return "BlockType '%s' point count not equal" % (str(self.type))
         for k, v in self.points.items():
@@ -1214,7 +1215,7 @@ class BlockType(object):
 
     def __str__(self):
 
-        s = 'BlockType: type = %s len = %s\n' % (self.type, self.len)
+        s = 'BlockType: type = {} len = {}\n'.format(self.type, self.len)
         for p in self.points_list:
             s += '  %s\n' % (str(p))
         return s
@@ -1434,7 +1435,7 @@ class PointType(object):
                 value = point_type.__dict__.get(k)
                 if v is not None and value is not None:
                     if value is None or v != value:
-                        return "PointType '%s' attribute '%s' not equal: %s  %s" % (str(self.id), str(k), str(v), str(value))
+                        return "PointType '{}' attribute '{}' not equal: {}  {}".format(str(self.id), str(k), str(v), str(value))
 
         return False
 
@@ -1470,4 +1471,4 @@ class Symbol(object):
 
     def __str__(self):
 
-        return 'Symbol: id = %s value = %s' % (self.id, self.value)
+        return 'Symbol: id = {} value = {}'.format(self.id, self.value)
